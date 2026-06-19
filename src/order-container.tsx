@@ -173,7 +173,7 @@ export function OrderContainer<T extends OrderItem>({
       modifiers={modifiers}
     >
       <SortableContext items={items} strategy={strategy}>
-        <OrderContext.Provider value={{ items, disabled }}>
+        <OrderContext.Provider value={{ items, disabled, activeId, axis }}>
           <div role="list" aria-roledescription="sortable list">
             {children}
           </div>

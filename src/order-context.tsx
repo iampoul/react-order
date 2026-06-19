@@ -18,6 +18,10 @@ export interface OrderContextValue<T extends OrderItem> {
   items: T[]
   /** Whether the drag-and-drop functionality is currently disabled. */
   disabled: boolean
+  /** The ID of the currently dragged item, or null if nothing is being dragged. */
+  activeId: string | null
+  /** The axis the items are being sorted along. */
+  axis: "vertical" | "horizontal" | "both"
 }
 
 export const OrderContext = createContext<OrderContextValue<any> | null>(null)

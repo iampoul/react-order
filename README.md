@@ -88,6 +88,21 @@ function App() {
 | `item` | `T` | The item object. |
 | `children` | `RenderProp` | Exposes `attributes`, `listeners`, `setNodeRef`, `style`, and `isDragging`. |
 
+### `useOrder()`
+
+A hook to access the current order state from anywhere inside an `<OrderContainer>`.
+
+```tsx
+const { items, disabled, activeId, axis } = useOrder()
+```
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `items` | `T[]` | The current list of items in their sorted order. |
+| `disabled` | `boolean` | Whether the drag-and-drop functionality is currently disabled. |
+| `activeId` | `string \| null` | The ID of the currently dragged item, or null if nothing is being dragged. |
+| `axis` | `"vertical" \| "horizontal" \| "both"` | The axis the items are being sorted along. |
+
 ## License
 
 MIT
