@@ -1,22 +1,35 @@
+"use client"
+
 import { createContext, useContext } from "react"
 
+/**
+ * Represents a single sortable item.
+ * Must include a unique `id` string.
+ */
 export interface OrderItem {
   id: string
 }
 
+/**
+ * The context value provided by the `<OrderContainer>`.
+ */
 export interface OrderContextValue<T extends OrderItem> {
+  /** The current list of items in their sorted order. */
   items: T[]
-  // MoveItem is handled by dnd-kit's onDragEnd
+  /** Whether the drag-and-drop functionality is currently disabled. */
+  disabled: boolean
 }
 
-export const OrderContext = createContext<OrderContextValue<any> | undefined>(
-  undefined
-)
+export const OrderContext = createContext<OrderContextValue<any> | null>(null)
 
-export function useOrder<T extends OrderItem>() {
+/**
+ * Hook to access the current order state.
+ * Must be used within an `<OrderContainer>`.
+ */
+export function useOrder<T extends OrderItem>(): OrderContextValue<T> {
   const context = useContext(OrderContext)
   if (!context) {
-    throw new Error("useOrder must be used within an OrderContainer")
+    throw new Error("useOrder must be used within an <OrderContainer>.")
   }
   return context as OrderContextValue<T>
 }
