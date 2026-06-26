@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, ReactNode, useMemo } from "react"
+import React, { useEffect, useState, ReactNode, useMemo } from "react"
 import {
   DndContext,
   closestCenter,
@@ -89,6 +89,10 @@ export function OrderContainer<T extends OrderItem>({
 }: OrderContainerProps<T>) {
   const [items, setItems] = useState<T[]>(initialItems)
   const [activeId, setActiveId] = useState<string | null>(null)
+
+  useEffect(() => {
+    setItems(initialItems)
+  }, [initialItems])
 
   // Dev-time validation
   if (process.env.NODE_ENV !== "production") {

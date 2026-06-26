@@ -1,5 +1,9 @@
 # @iampoul/react-order
 
+[![CI](https://github.com/iampoul/react-order/actions/workflows/ci.yml/badge.svg)](https://github.com/iampoul/react-order/actions/workflows/ci.yml)
+[![npm version](https://img.shields.io/npm/v/@iampoul/react-order.svg)](https://www.npmjs.com/package/@iampoul/react-order)
+[![npm downloads](https://img.shields.io/npm/dm/@iampoul/react-order.svg)](https://www.npmjs.com/package/@iampoul/react-order)
+
 A robust, accessible, and opinionated React drag-and-drop ordering component built on `dnd-kit`.
 
 ## Features
@@ -64,6 +68,12 @@ function App() {
   )
 }
 ```
+
+## Demo
+
+- Local demo app: `npm run demo:dev`
+- Production demo build: `npm run demo:build`
+- GitHub Pages-ready static files are generated in `demo/dist`.
 
 ## API
 
