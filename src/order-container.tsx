@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useEffect, useState, ReactNode, useMemo } from "react"
+import React, { useEffect, useState, ReactNode, useMemo, useRef } from "react"
 import {
   DndContext,
   closestCenter,
@@ -89,10 +89,16 @@ export function OrderContainer<T extends OrderItem>({
 }: OrderContainerProps<T>) {
   const [items, setItems] = useState<T[]>(initialItems)
   const [activeId, setActiveId] = useState<string | null>(null)
+  const itemsRef = useRef<T[]>(initialItems)
 
   useEffect(() => {
+    itemsRef.current = initialItems
     setItems(initialItems)
   }, [initialItems])
+
+  useEffect(() => {
+    itemsRef.current = items
+  }, [items])
 
   // Dev-time validation
   if (process.env.NODE_ENV !== "production") {
@@ -141,15 +147,18 @@ export function OrderContainer<T extends OrderItem>({
     setActiveId(null)
     const { active, over } = event
 
-    if (over && active.id !== over.id) {
-      setItems((items) => {
-        const oldIndex = items.findIndex((i) => i.id === active.id)
-        const newIndex = items.findIndex((i) => i.id === over.id)
-        const newItems = arrayMove(items, oldIndex, newIndex)
-        onReorder?.(newItems)
-        return newItems
-      })
-    }
+    if (!over || active.id === over.id) return
+
+    const currentItems = itemsRef.current
+    const oldIndex = currentItems.findIndex((i) => i.id === active.id)
+    const newIndex = currentItems.findIndex((i) => i.id === over.id)
+
+    if (oldIndex < 0 || newIndex < 0) return
+
+    const newItems = arrayMove(currentItems, oldIndex, newIndex)
+    itemsRef.current = newItems
+    setItems(newItems)
+    onReorder?.(newItems)
   }
 
   const activeItem = useMemo(
