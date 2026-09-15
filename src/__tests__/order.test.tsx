@@ -214,6 +214,49 @@ describe("OrderContainer & OrderItem", () => {
     expect(onReorder).toHaveBeenCalledWith([{ id: "2" }, { id: "3" }, { id: "1" }])
   })
 
+  it("allows a controlled parent to update items from onReorder without React warnings", () => {
+    const onReorder = vi.fn()
+    const consoleError = vi.spyOn(console, "error").mockImplementation(() => {})
+
+    function Wrapper() {
+      const [items, setItems] = React.useState(baseItems)
+
+      const handleReorder = (newItems: { id: string }[]) => {
+        onReorder(newItems)
+        setItems(newItems)
+      }
+
+      return (
+        <OrderContainer initialItems={items} onReorder={handleReorder}>
+          <TestList items={items} />
+        </OrderContainer>
+      )
+    }
+
+    try {
+      render(<Wrapper />)
+
+      act(() => {
+        dndHandlers.onDragEnd?.({ active: { id: "1" }, over: { id: "3" } })
+      })
+
+      expect(onReorder).toHaveBeenCalledTimes(1)
+      expect(onReorder).toHaveBeenCalledWith([{ id: "2" }, { id: "3" }, { id: "1" }])
+      expect(screen.getAllByRole("listitem").map((item) => item.textContent)).toEqual([
+        "Item 2",
+        "Item 3",
+        "Item 1",
+      ])
+      expect(
+        consoleError.mock.calls.some(([message]) =>
+          typeof message === "string" && message.includes("Cannot update a component")
+        )
+      ).toBe(false)
+    } finally {
+      consoleError.mockRestore()
+    }
+  })
+
   it("does not reorder when dropped over same item", () => {
     const onReorder = vi.fn()
     render(
@@ -226,6 +269,50 @@ describe("OrderContainer & OrderItem", () => {
       dndHandlers.onDragEnd?.({ active: { id: "1" }, over: { id: "1" } })
     })
     expect(onReorder).not.toHaveBeenCalled()
+  })
+
+  it("does not reorder when dropped without an over target", () => {
+    const onReorder = vi.fn()
+    render(
+      <OrderContainer initialItems={baseItems} onReorder={onReorder}>
+        <TestList />
+      </OrderContainer>
+    )
+
+    act(() => {
+      dndHandlers.onDragEnd?.({ active: { id: "1" }, over: null })
+    })
+
+    expect(onReorder).not.toHaveBeenCalled()
+    expect(screen.getAllByRole("listitem").map((item) => item.textContent)).toEqual([
+      "Item 1",
+      "Item 2",
+      "Item 3",
+    ])
+  })
+
+  it("does not reorder when active or over ids are missing", () => {
+    const onReorder = vi.fn()
+    render(
+      <OrderContainer initialItems={baseItems} onReorder={onReorder}>
+        <TestList />
+      </OrderContainer>
+    )
+
+    act(() => {
+      dndHandlers.onDragEnd?.({ active: { id: "missing" }, over: { id: "2" } })
+    })
+
+    act(() => {
+      dndHandlers.onDragEnd?.({ active: { id: "1" }, over: { id: "missing" } })
+    })
+
+    expect(onReorder).not.toHaveBeenCalled()
+    expect(screen.getAllByRole("listitem").map((item) => item.textContent)).toEqual([
+      "Item 1",
+      "Item 2",
+      "Item 3",
+    ])
   })
 
   it("syncs internal items when initialItems prop changes", () => {
